@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Priorités Party</title>
+<style>
+:root{--ink:#25243a;--muted:#716f83;--paper:#fbf8f2;--card:#fff;--accent:#6b4eff;--accent2:#ffcf5a;--line:#e9e4f0;--good:#16794b;--bad:#b42318}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(145deg,#f8f4ff,#fffaf0);color:var(--ink);font:16px/1.5 system-ui,-apple-system,Segoe UI,sans-serif;min-height:100vh}
+header{padding:22px 18px 8px;text-align:center}header .logo{font-size:13px;font-weight:800;letter-spacing:.16em;color:var(--accent);text-transform:uppercase}h1{font-size:clamp(2rem,6vw,3.3rem);line-height:1.05;margin:8px 0}h2{margin:0 0 10px;font-size:1.4rem}p{margin:.4rem 0;color:var(--muted)}main{width:min(900px,100%);margin:0 auto;padding:18px 16px 48px}.panel{background:rgba(255,255,255,.94);border:1px solid var(--line);border-radius:22px;padding:clamp(18px,4vw,30px);box-shadow:0 14px 45px #35256b0c;margin:14px 0}.row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}.row>*{flex:1}.field{display:block;width:100%;padding:13px 14px;border:1px solid #d9d3e6;border-radius:12px;background:#fff;font:inherit;color:var(--ink);margin:6px 0 14px}.btn{border:0;border-radius:13px;padding:12px 17px;background:var(--accent);color:white;font-weight:750;font:inherit;cursor:pointer}.btn.secondary{background:#f0ecff;color:var(--accent)}.btn:disabled{opacity:.35;cursor:not-allowed}.btn.full{width:100%}.hidden{display:none!important}.pill{display:inline-flex;border-radius:99px;background:#f0ecff;color:var(--accent);padding:5px 10px;font-size:13px;font-weight:750}.topline{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}.player-list{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}.player{border:1px solid var(--line);background:#fff;border-radius:99px;padding:7px 12px;font-size:14px}.muted{color:var(--muted)}.status{font-size:14px;color:var(--muted);margin-top:12px}.choice{display:flex;align-items:center;gap:12px;padding:12px;border:1px solid var(--line);border-radius:14px;background:white;margin:8px 0}.num{width:32px;height:32px;flex:none;display:grid;place-items:center;background:#f0ecff;color:var(--accent);font-weight:800;border-radius:10px}.choice-text{flex:1;font-weight:650}.arrows{display:flex;flex-direction:column;gap:4px}.arrow{border:1px solid var(--line);background:#fff;border-radius:8px;width:34px;height:28px;cursor:pointer}.arrow:disabled{opacity:.25}.progress{height:8px;background:#eee9f7;border-radius:99px;overflow:hidden;margin:14px 0}.progress span{display:block;height:100%;background:var(--accent);transition:width .2s}.notice{padding:12px 14px;border-radius:12px;background:#f4f0ff;color:#4b3aa3;margin:12px 0}.error{background:#fff0ef;color:var(--bad)}.success{background:#eaf8f0;color:var(--good)}.rank-card{border:1px solid var(--line);border-radius:16px;padding:15px;margin:12px 0;background:#fff}.rank-card ol{margin:10px 0 0;padding-left:28px}.rank-card li{padding:3px}.scoreline{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}.scoreline:last-child{border-bottom:0}.score{margin-left:auto;font-weight:850;font-size:1.2rem}.medal{font-size:1.5rem}.footer{text-align:center;font-size:12px;color:var(--muted);padding:10px}@media(min-width:700px){.twocol{display:grid;grid-template-columns:1fr 1fr;gap:14px}}
+</style>
+</head>
+<body>
+<header><div class="logo">Un jeu de préférences & de bluff</div><h1>Priorités <span style="color:var(--accent)">Party</span></h1><p>Classe les choix. Décode les amis. Marque des points.</p></header>
+<main>
+<section id="home" class="panel">
+<h2>On joue ?</h2><p>Crée un salon ou rejoins tes amis avec un code. Pas besoin de compte.</p>
+<div class="twocol">
+<div><h3>Créer une partie</h3><label for="createName">Ton pseudo</label><input id="createName" class="field" maxlength="40" placeholder="Ex. Camille"><label for="roundCount">Nombre de manches</label><select id="roundCount" class="field"><option value="1">1 manche (test)</option><option value="2">2 manches</option><option value="3" selected>3 manches</option><option value="4">4 manches</option><option value="5">5 manches</option><option value="6">6 manches</option><option value="7">7 manches</option><option value="8">8 manches</option><option value="9">9 manches</option><option value="10">10 manches</option></select><button id="createBtn" class="btn full">Créer le salon</button></div>
+<div><h3>Rejoindre une partie</h3><label for="joinName">Ton pseudo</label><input id="joinName" class="field" maxlength="40" placeholder="Ex. Alex"><label for="roomCode">Code du salon</label><input id="roomCode" class="field" maxlength="6" placeholder="ABC123" style="text-transform:uppercase"><button id="joinBtn" class="btn secondary full">Rejoindre</button></div>
+</div><div id="homeError" class="notice error hidden"></div>
+</section>
+<section id="game" class="hidden">
+<div class="panel">
+<div class="topline"><span class="pill" id="phasePill">Salon</span><span class="pill" id="roundPill"></span></div>
+<div class="topline"><div><h2 id="phaseTitle">Salle d'attente</h2><p id="phaseDesc">Invite tes amis avec le code ci-dessous.</p></div><div style="text-align:right"><div class="muted" style="font-size:12px">CODE DU SALON</div><div id="codeDisplay" style="font-size:1.7rem;font-weight:900;letter-spacing:.12em"></div></div></div>
+<div id="lobbyArea"><h3>Joueurs connectés</h3><div id="players" class="player-list"></div><div id="lobbyMessage" class="notice">Partage le code du salon avec tes amis.</div><button id="startBtn" class="btn full hidden">Lancer la partie</button></div>
+<div id="stageArea" class="hidden"></div><div id="feedback" class="status" aria-live="polite"></div>
+</div>
+</section>
+<div class="footer">Prototype multijoueur • Les classements restent secrets jusqu'à la révélation.</div>
+</main>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+const socket=io();
+let myId=null,roomCode=null,state=null,localRank=[],localAssignments={},submitted=false,lastPhaseRound='';
+const $=id=>document.getElementById(id);
+function showError(msg){$('homeError').textContent=msg;$('homeError').classList.remove('hidden')}
+function clearError(){$('homeError').classList.add('hidden')}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function phaseName(p){return ({lobby:'Salle d’attente',propose:'Propositions',rank:'Classement secret',guess:'Qui a classé quoi ?',results:'Révélation',final:'Résultats finaux'})[p]||p}
+$('createBtn').onclick=()=>{clearError();socket.emit('createRoom',{name:$('createName').value,totalRounds:$('roundCount').value})};
+$('joinBtn').onclick=()=>{clearError();socket.emit('joinRoom',{name:$('joinName').value,roomCode:$('roomCode').value})};
+$('roomCode').addEventListener('input',e=>e.target.value=e.target.value.toUpperCase().replace(/[^A-Z0-9]/g,''));
+socket.on('joined',d=>{myId=d.playerId;roomCode=d.code;$('home').classList.add('hidden');$('game').classList.remove('hidden');$('codeDisplay').textContent=roomCode});
+socket.on('errorMessage',showError);
+socket.on('state',s=>{
+ const key=s.phase+':'+s.round;
+ if(key!==lastPhaseRound){submitted=false;localRank=[];localAssignments={};lastPhaseRound=key;}
+ state=s;render()
+});
+function render(){
+ if(!state)return;
+ $('codeDisplay').textContent=state.code;$('phasePill').textContent=phaseName(state.phase);
+ $('roundPill').textContent=state.phase==='lobby'?'':`Manche ${state.round} / ${state.totalRounds}`;
+ $('phaseTitle').textContent=phaseName(state.phase);
+ $('players').innerHTML=state.players.map(p=>`<span class="player">${escapeHtml(p.name)}${p.id===state.hostId?' ★':''}${p.connected?'':' · déconnecté'}</span>`).join('');
+ $('lobbyArea').classList.toggle('hidden',state.phase!=='lobby');
+ $('stageArea').classList.toggle('hidden',state.phase==='lobby');
+ $('startBtn').classList.toggle('hidden',state.phase!=='lobby'||myId!==state.hostId);
+ $('feedback').textContent='';
+ if(state.phase==='lobby'){
+  $('phaseDesc').textContent='Le créateur lance la partie quand tout le monde est arrivé.';
+  $('lobbyMessage').textContent=`${state.players.length} joueur(s) dans le salon. Partage le code ${state.code}. Il faut au moins 2 joueurs.`;
+  $('startBtn').disabled=state.players.length<2;
+  $('stageArea').innerHTML='';return;
+ }
+ if(state.phase==='propose')renderPropose();
+ if(state.phase==='rank')renderRank();
+ if(state.phase==='guess')renderGuess();
+ if(state.phase==='results')renderResults();
+ if(state.phase==='final')renderFinal();
+}
+$('startBtn').onclick=()=>socket.emit('startGame');
+function progress(done,total){return `<div class="progress"><span style="width:${Math.round(done/Math.max(total,1)*100)}%"></span></div>`}
+function submittedByMe(field){return field&&field.includes(myId)}
+function renderPropose(){
+ $('phaseDesc').textContent='Chacun propose une idée. Toutes les propositions seront mélangées dans la phase suivante.';
+ const mine=state.proposals.some(p=>p.playerId===myId),done=state.proposals.length,total=state.players.length;
+ if(mine){$('stageArea').innerHTML=`<div class="notice success">Proposition validée ! En attente des autres joueurs…</div>${progress(done,total)}<p>${done} / ${total} propositions reçues.</p>`;return}
+ $('stageArea').innerHTML=`<h3>Ta proposition</h3><p>Choisis quelque chose à classer : un aliment, une activité, un lieu…</p><form id="proposalForm"><input class="field" id="proposalText" maxlength="100" placeholder="Ex. Le vin, les vacances, le karaoké…" required><button class="btn full">Valider ma proposition</button></form>${progress(done,total)}<p>${done} / ${total} joueurs ont proposé.</p>`;
+ $('proposalForm').onsubmit=e=>{e.preventDefault();socket.emit('submitProposal',{text:$('proposalText').value});$('proposalText').disabled=true;e.target.querySelector('button').disabled=true};
+}
+function renderRank(){
+ $('phaseDesc').textContent='Classe les propositions de ta préférée à ta moins préférée. Les autres ne verront pas ton classement.';
+ const done=Object.keys(state.rankings||{}).length;
+ if(submitted){$('stageArea').innerHTML=`<div class="notice success">Classement validé et gardé secret. En attente des autres joueurs…</div>${progress(done,state.players.length)}<p>Le classement sera révélé quand tout le monde aura validé.</p>`;return}
+ if(!localRank.length)localRank=state.proposals.map(p=>p.text);
+ $('stageArea').innerHTML=`<h3>Ton ordre de préférence</h3><p>1 = préféré · dernière position = le moins apprécié</p><div id="rankList"></div><button id="submitRank" class="btn full">Valider mon classement</button>`;
+ const list=$('rankList');
+ function paint(){list.innerHTML=localRank.map((x,i)=>`<div class="choice"><span class="num">${i+1}</span><span class="choice-text">${escapeHtml(x)}</span><span class="arrows"><button class="arrow" data-i="${i}" data-d="-1" ${i===0?'disabled':''} aria-label="Monter">↑</button><button class="arrow" data-i="${i}" data-d="1" ${i===localRank.length-1?'disabled':''} aria-label="Descendre">↓</button></span></div>`).join('');list.querySelectorAll('button').forEach(b=>b.onclick=()=>{const i=+b.dataset.i,j=i+(+b.dataset.d);[localRank[i],localRank[j]]=[localRank[j],localRank[i]];paint()})}
+ paint();$('submitRank').onclick=()=>{socket.emit('submitRanking',{items:localRank});submitted=true;renderRank()};
+}
+function renderGuess(){
+ $('phaseDesc').textContent='Associe chaque classement anonyme au joueur qui, selon toi, l’a créé. Chaque joueur ne peut être choisi qu’une fois.';
+ const already=state.guesses&&Object.prototype.hasOwnProperty.call(state.guesses,myId);
+ if(already){$('stageArea').innerHTML=`<div class="notice success">Associations validées ! En attente des autres joueurs…</div>${progress(Object.keys(state.guesses).length,state.players.length)}`;return}
+ const names=state.players;
+ $('stageArea').innerHTML=`<div class="notice">Il y a ${state.rankings.length} classements anonymes. Observe leur ordre avant de faire tes suppositions.</div><div id="guessList"></div><button id="submitGuesses" class="btn full">Valider mes associations</button>`;
+ const list=$('guessList');
+ list.innerHTML=state.rankings.map((r,i)=>`<div class="rank-card"><div class="topline"><strong>Classement ${i+1}</strong><span class="pill">${r.items.length} choix</span></div><ol>${r.items.map(x=>`<li>${escapeHtml(x)}</li>`).join('')}</ol><label for="guess-${i}">Qui l’a créé ?</label><select class="field guess-select" id="guess-${i}" data-index="${i}"><option value="">Choisir un pseudo…</option>${names.map(p=>`<option value="${p.id}">${escapeHtml(p.name)}</option>`).join('')}</select></div>`).join('');
+ list.querySelectorAll('select').forEach(s=>s.onchange=updateGuessOptions);
+ function updateGuessOptions(){const selected=[...list.querySelectorAll('select')].map(s=>s.value).filter(Boolean);list.querySelectorAll('select').forEach(s=>[...s.options].forEach(o=>{if(o.value)o.disabled=o.value!==s.value&&selected.includes(o.value)}))}
+ $('submitGuesses').onclick=()=>{const selects=[...list.querySelectorAll('select')];if(selects.some(s=>!s.value)){alert('Associe chaque classement à un pseudo.');return}const assignments={};selects.forEach(s=>assignments[s.dataset.index]=s.value);if(new Set(Object.values(assignments)).size!==selects.length){alert('Chaque pseudo ne peut être choisi qu’une fois.');return}socket.emit('submitGuesses',{assignments});$('submitGuesses').disabled=true};
+}
+function renderResults(){
+ $('phaseDesc').textContent='Les auteurs sont révélés ! Découvre tes points de cette manche et le classement général.';
+ const r=state.results;if(!r){$('stageArea').innerHTML='Révélation en cours…';return}
+ const myPoints=r.roundPoints[myId]||0;
+ $('stageArea').innerHTML=`<div class="notice success">Tu marques ${myPoints} point(s) cette manche.</div><h3>Les classements révélés</h3>${r.rankings.map((x,i)=>`<div class="rank-card"><div class="topline"><strong>Classement ${i+1}</strong><span class="pill">${escapeHtml(x.authorName)}</span></div><ol>${x.items.map(y=>`<li>${escapeHtml(y)}</li>`).join('')}</ol><p class="muted">Les bonnes associations rapportent 1 point au joueur qui a deviné.</p></div>`).join('')}<h3>Scores après la manche ${state.round}</h3>${scoreRows(r.scores,true)}${myId===state.hostId?(state.round<state.totalRounds?'<button id="nextBtn" class="btn full">Manche suivante →</button>':'<button id="finalBtn" class="btn full">Voir le classement final</button>'):'<p class="status">En attente du créateur pour continuer…</p>'}`;
+ if($('nextBtn'))$('nextBtn').onclick=()=>socket.emit('nextRound');
+ if($('finalBtn'))$('finalBtn').onclick=()=>socket.emit('showFinal');
+}
+function scoreRows(scores,withRound){return scores.map((p,i)=>`<div class="scoreline"><span class="medal">${i===0?'🏆':i===1?'🥈':i===2?'🥉':'🎯'}</span><strong>${escapeHtml(p.name)}</strong>${withRound?`<span class="muted">+${p.roundPoints} cette manche</span>`:''}<span class="score">${p.score} pt${p.score>1?'s':''}</span></div>`).join('')}
+function renderFinal(){
+ $('phaseDesc').textContent='Trois… ou autant de manches que vous avez choisi. Voici le classement final !';
+ const scores=[...state.players].sort((a,b)=>b.score-a.score||a.name.localeCompare(b.name));
+ $('stageArea').innerHTML=`<div style="text-align:center;padding:12px"><div style="font-size:3rem">🏆</div><h2>Fin de la partie !</h2><p>Bravo à tous les détectives des préférences.</p></div><h3>Classement final</h3>${scoreRows(scores,false)}<button class="btn secondary full" id="copyCode">Copier le code du salon</button><p class="status">Pour une nouvelle partie, créez un nouveau salon.</p>`;
+ $('copyCode').onclick=async()=>{try{await navigator.clipboard.writeText(state.code);$('copyCode').textContent='Code copié !'}catch(e){alert('Code du salon : '+state.code)}};
+}

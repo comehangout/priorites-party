@@ -1,0 +1,14 @@
+{
+  "name": "priorites-party",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Jeu multijoueur de classement et de déduction inspiré de Priorities",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "socket.io": "^4.8.1"
+  }
+}
